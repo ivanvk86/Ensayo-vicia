@@ -9,16 +9,19 @@ from plotnine import ggplot, aes, geom_boxplot, geom_point, theme_bw, facet_wrap
 
 Datos = pd.read_csv("Resumen_tres_temporadas.csv")
 Datos2 = pd.read_csv("Resumen_tres_temporadas_cuali.csv")
+Datos3 = pd.read_csv("Resumen_tres_temporadas_disc.csv")
 
 print(Datos.shape)
 
 print(Datos[0:9])
+print(Datos3[0:9])
 
 print(Datos.describe().transpose())
+print(Datos3.describe().transpose())
 
 print(Datos.Rendimiento[0:3])
 
-par = sns.pairplot(Datos, hue="Antecesor", x_vars=["Fsecado", "MSVicia", "PPEstival"], y_vars="Rendimiento")
+par = sns.pairplot(Datos3, hue="Antecesor", x_vars=["Fsecado", "MSVicia", "PPEstival"], y_vars="Rendimiento")
 plt.show()
 
 #Analizar fecha de secado junto con precipitaciones estivales. Ya que en un año más seco se secó más temprano.
@@ -30,29 +33,35 @@ plt.plot(Datos['Fsecado'], line_coef(Datos["Fsecado"]))
 plt.scatter(x=Datos["Fsecado"], y=Datos["Rendimiento"], color='red', alpha=0.5)
 plt.show()
 
-rendimiento_sobre_AUMaiz = Datos["Rendimiento"]/Datos["AUMaiz"]
-fitted = np.polyfit(Datos["Fsecado"],rendimiento_sobre_AUMaiz,1)
-line_fitted = np.poly1d(fitted)
-plt.plot(Datos['Fsecado'], line_fitted(Datos["Fsecado"]))
-plt.scatter(x=Datos["Fsecado"], y=rendimiento_sobre_AUMaiz, color='red', alpha=0.5)
+coef = np.polyfit(Datos3["Fsecado"],Datos3["Rendimiento"],1)
+line_coef = np.poly1d(coef)
+plt.plot(Datos3['Fsecado'], line_coef(Datos3["Fsecado"]))
+plt.scatter(x=Datos3["Fsecado"], y=Datos3["Rendimiento"], color='red', alpha=0.5)
 plt.show()
 
-aguaMz = Datos["PPEstival"]*.75 + Datos["AUMaiz"]
+rendimiento_sobre_AUMaiz = Datos3["Rendimiento"]/Datos3["AUMaiz"]
+fitted = np.polyfit(Datos3["Fsecado"],rendimiento_sobre_AUMaiz,1)
+line_fitted = np.poly1d(fitted)
+plt.plot(Datos3['Fsecado'], line_fitted(Datos3["Fsecado"]))
+plt.scatter(x=Datos3["Fsecado"], y=rendimiento_sobre_AUMaiz, color='red', alpha=0.5)
+plt.show()
+
+aguaMz = Datos3["PPEstival"]*.75 + Datos3["AUMaiz"]
 df = pd.DataFrame()
-df['Rendimiento'] = Datos['Rendimiento']
+df['Rendimiento'] = Datos3['Rendimiento']
 df['aguaMz'] = aguaMz
 print(df)
 df.corr(method='pearson')
 
-fitted2 = np.polyfit(aguaMz,Datos["Rendimiento"],1)
+fitted2 = np.polyfit(aguaMz,Datos3["Rendimiento"],1)
 line_fitted2 = np.poly1d(fitted2)
 plt.plot(aguaMz, line_fitted2(aguaMz))
-plt.scatter(x= aguaMz, y= Datos["Rendimiento"], color= 'blue')
+plt.scatter(x= aguaMz, y= Datos3["Rendimiento"], color= 'blue')
 plt.show()
 
-rendimiento_en_agua = Datos["Rendimiento"]/aguaMz
+rendimiento_en_agua = Datos3["Rendimiento"]/aguaMz
 print(rendimiento_en_agua)
-plt.scatter(x=Datos["Fsecado"], y=rendimiento_en_agua, color='red', alpha=0.5)
+plt.scatter(x=Datos3["Fsecado"], y=rendimiento_en_agua, color='red', alpha=0.5)
 plt.show()
 
 
